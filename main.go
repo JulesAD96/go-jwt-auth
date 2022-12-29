@@ -21,7 +21,7 @@ func initRouter() *gin.Engine {
 	api := router.Group("/api")
 	{
 		api.POST("/token", controllers.GenerateToken)
-		api.POST("/user/register", controllers.Register)
+		api.POST("/register", controllers.Register)
 		secured := api.Group("/secured").Use(middlewares.Auth())
 		{
 			secured.GET("/ping", controllers.Ping)
