@@ -11,26 +11,32 @@ import (
 // Register a new user by using credentials
 func Register(context *gin.Context) {
 	var user models.User
-	if err := context.ShouldBindJSON(&user); err != nil {
+
+	// binding data
+	err := context.ShouldBindJSON(&user)
+	if err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		context.Abort()
 		return
 	}
-	if err := user.HashPassword(user.Password); err != nil {
-		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	// hash password
+	errPasswordHashing := user.HashPassword(user.Password)
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"error": errPasswordHashing.Error()})
 		context.Abort()
 		return
 	}
 
+	//create record in database
 	record := database.Instance.Create(&user)
 	if record.Error != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"error": record.Error.Error()})
 		context.Abort()
 		return
 	}
-
+	// response
 	context.JSON(http.StatusCreated, gin.H{
-		"userId":   user.ID,
+		"id":       user.ID,
 		"email":    user.Email,
 		"username": user.Username,
 	})
