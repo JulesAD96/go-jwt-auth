@@ -18,6 +18,7 @@ func main() {
 
 func initRouter() *gin.Engine {
 	router := gin.Default()
+	router.SetTrustedProxies([]string{"127.0.0.1", "localhost"})
 	api := router.Group("/api")
 	{
 		api.POST("/token", controllers.GenerateToken)
